@@ -70,33 +70,30 @@ bool unio(int* lead, int* prof, int x, int y)
 
 vector < pair <int,int> > nodos;
 
-float kruskal(int *lead, int* prof, int modem, int nods)
+pair<float,float> kruskal(int *lead, int* prof, int modem, int nods)
 {
-    float costo = 0;
+    float costoReg = 0, costoEsp = 0;
     int trees = nods;
     Arco dummy;
     
     while(trees>modem){
         dummy = cola.top();
         cola.pop();
-        cout << dummy.ar1<<" , "<<dummy.ar2<<" -> "<<dummy.peso<<endl;
-        cout << nodos[dummy.ar1].first<<","<<nodos[dummy.ar1].second<<" y "<<nodos[dummy.ar2].first<<","<<nodos[dummy.ar2].second ;
+        // cout << dummy.ar1<<" , "<<dummy.ar2<<" -> "<<dummy.peso<<endl;
+        // cout << nodos[dummy.ar1].first<<","<<nodos[dummy.ar1].second<<" y "<<nodos[dummy.ar2].first<<","<<nodos[dummy.ar2].second ;
         if(unio(lead,prof,dummy.ar1,dummy.ar2)){
-            cout<<" unido ";
+            //cout<<" unido ";
             trees--;
-            costo += dummy.peso > Arco::tamReg ?
-                dummy.peso*Arco::costE
-                : dummy.peso*Arco::costR;
-            cout << (dummy.peso > Arco::tamReg ?
-                     dummy.peso*Arco::costE
-                     : dummy.peso*Arco::costR);
-            
+            if(dummy.peso > Arco::tamReg)
+                costoEsp += ceil(dummy.peso)*Arco::costE;
+            else
+                costoReg += ceil(dummy.peso)*Arco::costR;            
             
         }
-        cout<< endl;
+//        cout<< endl;
         
     }
-    return costo;
+    return pair<float,float>(costoReg,costoEsp);
 }
 
 int Arco::costR = 0;
@@ -112,15 +109,15 @@ int main( int argc, char *argv[] ){
     
     if(scanf("%i",&casos)!=1)
         cout<<"welp"<<endl;
-    else
-        cout<<casos<<endl;
+    // else
+    //     cout<<casos<<endl;
 
     for(int j=0;j<casos;j++){
     
     if(scanf("%i %i %i %i %i",&numNodo, &Arco::tamReg, &modem, &Arco::costR, &Arco::costE)!=5)
         cout<<"welp"<<endl;
-    else
-        cout<<numNodo<<" "<<Arco::tamReg<<" "<<modem<<" "<<Arco::costR<<" "<<Arco::costE<<endl;
+    // else
+    //     cout<<numNodo<<" "<<Arco::tamReg<<" "<<modem<<" "<<Arco::costR<<" "<<Arco::costE<<endl;
 
     int x,y;
     for(int i=0;i<numNodo;i++)
@@ -146,9 +143,9 @@ int main( int argc, char *argv[] ){
         leader[i]=i;
     for(int i=0;i<numNodo;i++)
         profun[i]=i;
+    pair<float,float> ans = kruskal(leader,profun,modem,numNodo);
     
-    cout<<kruskal(leader,profun,modem,numNodo)<<endl;
-
+    printf("Casos #%d: %.3f %.3f\n",j+1,ans.first,ans.second);
     nodos.clear();
     
     }
