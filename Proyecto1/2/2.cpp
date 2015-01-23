@@ -5,8 +5,10 @@
 #include <cmath>
 using namespace std;
 
+// Vector usado para almacenar los arcos
 vector < pair <int,int> > arcos;
 
+// DFS usado para marcar los nodos
 int dfs(int nodo, vector<int>* hijos, int* componentes){
    if(hijos[nodo].empty()){
       componentes[nodo]=1;
@@ -19,7 +21,6 @@ int dfs(int nodo, vector<int>* hijos, int* componentes){
    }
    return componentes[nodo];
 }
-
 
 int main( int argc, char *argv[] ){
 
@@ -42,13 +43,16 @@ int main( int argc, char *argv[] ){
 	  else{
 	     arcos.push_back(make_pair(x-1,y-1));
 	  }
-    
+
+       // Estructura usada para almacenar el padre de los nodos
        int padre[numNodo];
        for(int i=0;i<numNodo;i++)
 	  padre[i]=-1;
 
+       // Estructura usada para guardar los hijos de los nodos
        vector<int> hijos[numNodo];
-            
+
+       // Estrucutra usada para los componentes
        int componentes[numNodo];
        componentes[0]=numNodo;
     
@@ -85,6 +89,7 @@ int main( int argc, char *argv[] ){
 		if(d!= -1)
 		   numNodo = d;
 	     }
+	  // Cada vez que se elimina el arco, se actualizan los valores de componentes
 	  else if(c=='R'){
 	     int dpadre=arcos[d-1].first, dhijo=arcos[d-1].second;
 	     padre[arcos[d-1].second] = -1;

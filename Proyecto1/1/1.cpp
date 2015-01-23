@@ -5,6 +5,8 @@
 #include <cmath>
 using namespace std;
 
+// Clase Arco
+// Usada para guardar los arcos asi como los pesos 
 class Arco
 {
 public:
@@ -24,6 +26,8 @@ public:
                 
 };
 
+// Clase CompareArco
+// Usada para comparar nodos
 class CompareArco
 {
 public:
@@ -32,19 +36,16 @@ public:
   }
 };
 
+// Cola de prioridades
 priority_queue < Arco, vector<Arco>, CompareArco> cola;
-    
+
+// Unio y Find
+// Usados en la estructura del Disjoin set usado por 
 int find(int* lead, int x)
 {
   if(lead[x] != lead[lead[x]])
     lead[x] = find(lead,lead[x]);
   return lead[x];
-};
-
-ostream& operator<<(ostream& out, const Arco dummy)
-{
-  out << dummy.peso;
-  return out;
 };
 
 bool unio(int* lead, int* prof, int x, int y)
@@ -70,6 +71,7 @@ bool unio(int* lead, int* prof, int x, int y)
 
 vector < pair <int,int> > nodos;
 
+// Algoritmo de Kruskal
 pair<float,float> kruskal(int *lead, int* prof, int modem, int nods)
 {
   float costoReg = 0, costoEsp = 0;
