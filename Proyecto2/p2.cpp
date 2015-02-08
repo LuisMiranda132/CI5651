@@ -59,11 +59,11 @@ void split(const string &s, char c, vector<string> &v){
 /*
     Crea un grafo de 
 */
-Node* readGraph(char* fileName, int &sizeGraph){
+vector<Node> readGraph(char* fileName, int &sizeGraph){
 
     ifstream currentFile (fileName);
     string rLine, pLine;
-    Node* output;
+    vector<Node> output;
     
     if ( !currentFile.is_open() ){
         cout << "El archivo que especifico no existe.";
@@ -74,34 +74,52 @@ Node* readGraph(char* fileName, int &sizeGraph){
         while (getline (currentFile, rLine)){
             
             if (rLine[0] != 'c'){
-             /*
+             
                 vector<string> sString;
                 
                 if (rLine[0] == 'p'){
+
                     split(&rLine[7],' ', sString);
-                    sizeGraph* = sString[0];
-                    output = Node [sString[0]];
+
+                    int proxyInt;
+                    istringstream buffer(sString[0]);
+                    buffer >> proxyInt;
+                    
+                    sizeGraph = proxyInt;
+                    for (int i = 0; i < proxyInt; i++){
+                        output.push_back(Node());
+                    }
                 }
                 else if (rLine[0] == 'e'){
+
                     split(&rLine[2],' ', sString);
-                    output[sString[0]].edge.push_back(sString[1]);
-                    output[sString[1]].edge.push_back(sString[0]);
+                    
+                    int indexEdge1, indexEdge2;
+                    istringstream buffer(sString[0]);
+                    buffer >> indexEdge1;
+                    indexEdge1--;
+                    istringstream buffer2(sString[1]);
+                    buffer2 >> indexEdge2;
+                    indexEdge2--;
+                    
+                    output[indexEdge1].edge.push_back(indexEdge2);
+                    output[indexEdge2].edge.push_back(indexEdge1);
                 }
                 
-                */
-                
-                /*   
                 //Muestra lo que se lee
-                for (int i = 0; i < sString.size(); i++){
-                    cout << sString[i] <<' ' << i;
-                }
                 
-                cout << '\n';
-                */
+                /*
+                for (int i = 0; i < sString.size(); i++){
+                    cout << sString[i] << " " << i << "\n";
+                }
+               */
+
             }
         }     
         currentFile.close();
     }
+    
+    return output;
 }
 
 
@@ -109,6 +127,8 @@ Node* readGraph(char* fileName, int &sizeGraph){
 int main( int argc, char *argv[] ){
     
     char *fileName;
+    int nodeNum = 0;
+    vector<Node> graph;
     
     if (argc < 2) {
         cout << "Especifique el nombre del archivo con el grafo por favor:\n";
@@ -118,9 +138,15 @@ int main( int argc, char *argv[] ){
         fileName = argv[1];
     }
     
-    readGraph(fileName);
+    graph = readGraph(fileName, nodeNum);
     
-    
+    for (int i = 0; i < graph.size(); i++){
+        cout << "Color: " << graph[i].color << "\n Edges: ";
+        for (int j = 0; j < graph[i].edge.size(); j++){ 
+            cout << graph[i].edge[j] << " ";
+        }    
+        cout << "\n";
+    }
 }
 
 
