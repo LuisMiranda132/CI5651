@@ -186,29 +186,29 @@ vector<Node> readGraph(char* fileName, int &sizeGraph){
 //     }
 //     else {
         
-//         while (getline (currentFile, rLine)){
-            
-    if (rLine[0] != 'c'){
+    while (getline (currentFile, rLine)){
 	
-	vector<string> sString;
-        
+	if (rLine[0] != 'c'){
+	    
+	    vector<string> sString;
+	    
 	if (rLine[0] == 'p'){
 	    
 	    split(&rLine[7],' ', sString);
-		    
+	    
 	    int proxyInt;
 	    istringstream buffer(sString[0]);
 	    buffer >> proxyInt;
-                    
+            
 	    sizeGraph = proxyInt;
 	    for (int i = 0; i < proxyInt; i++){
 		output.push_back(Node());
 	    }
 	}
 	else if (rLine[0] == 'e'){
-
+	    
 	    split(&rLine[2],' ', sString);
-                    
+            
 	    int indexEdge1, indexEdge2;
 	    istringstream buffer(sString[0]);
 	    buffer >> indexEdge1;
@@ -220,18 +220,19 @@ vector<Node> readGraph(char* fileName, int &sizeGraph){
 	    output[indexEdge1].edge.push_back(indexEdge2);
 	    output[indexEdge2].edge.push_back(indexEdge1);
 	}
-                
+        
 	//Muestra lo que se lee
-                
+        
 	
-	  for (int i = 0; i < sString.size(); i++){
-	  cout << sString[i] << " " << i << "\n";
-	  }
+	for (int i = 0; i < sString.size(); i++){
+	    cout << sString[i] << " " << i << "\n";
+	}
+       
+	
+	}
 
-	
-    
-	currentFile.close();
     }
+    currentFile.close();
     
     return output;
 }
