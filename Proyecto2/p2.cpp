@@ -23,7 +23,23 @@ void brelaz (int n, // Numero de vertices.
     int k = w + 1;
 }
 
-void split(const string& s, char c, vector<string>& v){
+class Node 
+{
+public:
+    int color;
+    vector<int> posibleColor, edge;
+    
+    Node(){
+        this -> color = 0;
+    }
+};
+
+
+/*
+    Dado un caracter, separa un string en substring que almacena en un vector dado,
+    cada vez que se encuentre con el caracter dado.
+*/
+void split(const string &s, char c, vector<string> &v){
     
     string::size_type i = 0;
     string::size_type j = s.find(c);
@@ -39,10 +55,15 @@ void split(const string& s, char c, vector<string>& v){
     }
 
 }
-void readGraph(char* fileName){
+
+/*
+    Crea un grafo de 
+*/
+Node* readGraph(char* fileName, int &sizeGraph){
 
     ifstream currentFile (fileName);
     string rLine, pLine;
+    Node* output;
     
     if ( !currentFile.is_open() ){
         cout << "El archivo que especifico no existe.";
@@ -53,17 +74,21 @@ void readGraph(char* fileName){
         while (getline (currentFile, rLine)){
             
             if (rLine[0] != 'c'){
-             
+             /*
                 vector<string> sString;
                 
                 if (rLine[0] == 'p'){
                     split(&rLine[7],' ', sString);
+                    sizeGraph* = sString[0];
+                    output = Node [sString[0]];
                 }
                 else if (rLine[0] == 'e'){
                     split(&rLine[2],' ', sString);
+                    output[sString[0]].edge.push_back(sString[1]);
+                    output[sString[1]].edge.push_back(sString[0]);
                 }
                 
-                
+                */
                 
                 /*   
                 //Muestra lo que se lee
