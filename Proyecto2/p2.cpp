@@ -17,14 +17,9 @@
 
 using namespace std;
 
-void brelaz (int n, // Numero de vertices.
-             int q, // Numero de colores de la heuristica. 
-             int w  // Dimension inicial del Clique.
-             )
-{
-    bool back = false;
-    int k = w + 1;
-}
+/*
+    Clase que define la estrutura nodo
+*/
 
 class Node 
 {
@@ -36,6 +31,11 @@ public:
     
 };
 
+
+/*
+    Compara la conectividad de 2 nodos
+*/
+
 class CompareDegree
 {
 public:  
@@ -43,6 +43,10 @@ public:
 	return left->edge.size() < right->edge.size();
     }
 };
+
+/*
+    Compara la saturacion de 2 nodos
+*/
 
 class CompareSatur
 {
@@ -56,6 +60,11 @@ public:
 	    return left->satDegree >= right->satDegree;
     }
 };
+
+//==============================================================================
+/*
+    Heuritica de desaturacion
+*/
 
 int desatur(Node* graph, int n){
     priority_queue < Node*, vector<Node*>, CompareDegree> degrees;
@@ -150,6 +159,7 @@ int desatur(Node* graph, int n){
     return -1;
 }
 
+//==============================================================================
 /*
     Dado un caracter, separa un string en substring que almacena en un vector dado,
     cada vez que se encuentre con el caracter dado.
@@ -171,6 +181,7 @@ void split(const string &s, char c, vector<string> &v){
 
 }
 
+//==============================================================================
 /*
     Crea un grafo de 
 */
@@ -188,54 +199,111 @@ vector<Node> readGraph(char* fileName, int &sizeGraph){
         
     while (getline (currentFile, rLine)){
 	
-	if (rLine[0] != 'c'){
-	    
-	    vector<string> sString;
-	    
-	if (rLine[0] == 'p'){
-	    
-	    split(&rLine[7],' ', sString);
-	    
-	    int proxyInt;
-	    istringstream buffer(sString[0]);
-	    buffer >> proxyInt;
-            
-	    sizeGraph = proxyInt;
-	    for (int i = 0; i < proxyInt; i++){
-		output.push_back(Node());
-	    }
-	}
-	else if (rLine[0] == 'e'){
-	    
-	    split(&rLine[2],' ', sString);
-            
-	    int indexEdge1, indexEdge2;
-	    istringstream buffer(sString[0]);
-	    buffer >> indexEdge1;
-	    indexEdge1--;
-	    istringstream buffer2(sString[1]);
-	    buffer2 >> indexEdge2;
-	    indexEdge2--;
+	    if (rLine[0] != 'c'){
+	        
+	        vector<string> sString;
+	        
+	        if (rLine[0] == 'p'){
+	            
+	            split(&rLine[7],' ', sString);
+	            
+	            int proxyInt;
+	            istringstream buffer(sString[0]);
+	            buffer >> proxyInt;
                     
-	    output[indexEdge1].edge.push_back(indexEdge2);
-	    output[indexEdge2].edge.push_back(indexEdge1);
-	}
-        
-	//Muestra lo que se lee
-        
+	            sizeGraph = proxyInt;
+	            for (int i = 0; i < proxyInt; i++){
+		        output.push_back(Node());
+	            }
+	        }
+	        else if (rLine[0] == 'e'){
+	            
+	            split(&rLine[2],' ', sString);
+                    
+	            int indexEdge1, indexEdge2;
+	            istringstream buffer(sString[0]);
+	            buffer >> indexEdge1;
+	            indexEdge1--;
+	            istringstream buffer2(sString[1]);
+	            buffer2 >> indexEdge2;
+	            indexEdge2--;
+                            
+	            output[indexEdge1].edge.push_back(indexEdge2);
+	            output[indexEdge2].edge.push_back(indexEdge1);
+	        }
+                
+	        //Muestra lo que se lee
+                
 	
-	for (int i = 0; i < sString.size(); i++){
-	    cout << sString[i] << " " << i << "\n";
-	}
-       
+	        for (int i = 0; i < sString.size(); i++){
+	            cout << sString[i] << " " << i << "\n";
+	        }
+           
 	
-	}
+	    }
 
     }
     currentFile.close();
     
     return output;
 }
+
+//==============================================================================
+/*
+    Algoritmo de Brelaz Modificado 
+*/
+
+void label(int node, vector<Node>& graph){
+    
+}
+
+void brelaz (int n, // Numero de vertices.
+             int q, // Numero de colores de la heuristica. 
+             int w,  // Dimension inicial del Clique.
+             vector<Node>& graph
+             )
+{
+    bool back = false;
+    int k = w + 1;
+    
+    while (true){
+        if (!back){
+            min(colorUsed + 1, q - 1);
+            
+        }
+        else {
+            
+        }
+        if () {
+            if (k > n) {
+                // EXIT IF
+                if (q == w){
+                    break;
+                }
+            }
+            else{
+                back = false;
+            }
+        }
+        else {
+            back = true;
+        }
+        if (back) {
+            
+            // EXIT IF
+            if (k<w+1){
+                break;
+            }
+        }
+    }
+    // STOP ??
+    
+}
+
+//==============================================================================
+/*
+    Main
+*/
 
 
 int main( int argc, char *argv[] ){
