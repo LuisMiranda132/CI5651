@@ -35,6 +35,19 @@ public:
     
 };
 
+ostream& operator<<(ostream& out,const Node dummy)
+{
+    out<<"\t Color: "<<dummy.color;
+    out<<"\tlabel: "<<dummy.label;
+    out<<"\t Sat: "<<dummy.satDegree;
+    out<<"\t Edges:"<<dummy.edge.size()<<" {";
+    for(int j=0;j<dummy.edge.size();j++)
+	out<<dummy.edge[j]<<" , ";
+    out<<"}"<<endl;
+    return out;
+}
+
+
 
 /*
     Compara la conectividad de 2 nodos
@@ -191,15 +204,15 @@ answer desatur(vector<Node> graph, int n){
 
     }
     
-    cout << "end"<<endl;
-    for(int i = 0; i<graph.size(); i++){
-    	cout<<"i: "<<i<<"\t Color: "<<graph[i].color;
-    	cout<<"\t Sat: "<<graph[i].satDegree;
-    	cout<<"\t Edges:"<<graph[i].edge.size()<<" {";
-    	for(int j=0;j<graph[i].edge.size();j++)
-    	    cout<<graph[i].edge[j]<<" , ";
-    	cout<<"}\t posColor:"<<graph[i].posColor<<endl;
-    }
+    // cout << "end"<<endl;
+    // for(int i = 0; i<graph.size(); i++){
+    // 	cout<<"i: "<<i<<"\t Color: "<<graph[i].color;
+    // 	cout<<"\t Sat: "<<graph[i].satDegree;
+    // 	cout<<"\t Edges:"<<graph[i].edge.size()<<" {";
+    // 	for(int j=0;j<graph[i].edge.size();j++)
+    // 	    cout<<graph[i].edge[j]<<" , ";
+    // 	cout<<"}\t posColor:"<<graph[i].posColor<<endl;
+    // }
     
 //    return make_pair(make_pair(clique,top),order);
     return ans;
@@ -307,16 +320,20 @@ void brelaz (int n, // Numero de vertices.
              vector<Node>& graph
              )
 {
-    
+
     bool back = false;
-    for(int i=0;i<dummy.w;i++)
+    for(int i=0;i<dummy.w;i++){
 	graph[dummy.order[i].first].color = dummy.order[i].second;
+	graph[dummy.order[i].first].label = true;
+    }
+    
+    dummy.w = dummy.w -1;
+        
+    int k = dummy.w+1,
+	uk = dummy.w+1,
+	s = dummy.w+1;
 
-    int k = dummy.w,
-	uk = dummy.w,
-	s = dummy.w;
-
-    for(int i = 0; i<graph.size(); i++){
+/*    for(int i = 0; i<graph.size(); i++){
     	cout<<"i: "<<i<<"\t Color: "<<graph[i].color;
     	cout<<"\t Sat: "<<graph[i].satDegree;
     	cout<<"\t Edges:"<<graph[i].edge.size()<<" {";
@@ -324,7 +341,7 @@ void brelaz (int n, // Numero de vertices.
     	    cout<<graph[i].edge[j]<<" , ";
     	cout<<"}\t posColor:"<<graph[i].posColor<<endl;
     }
-
+*/
     cout << "welp" << endl;
         
     while (true){
@@ -332,8 +349,9 @@ void brelaz (int n, // Numero de vertices.
     
         if (!back){
 	    lenodo = dummy.order[k].first;
-	    cout << k <<": " <<lenodo<< endl;
-
+	    cout << "k= "<<k <<": " <<lenodo<< endl;
+	    cout << graph[lenodo] << endl;
+	    
 	    for(int i=1; i <= min(uk + 1, dummy.q); i++)
 		    graph[lenodo].U.insert(i);
 		
@@ -383,10 +401,19 @@ void brelaz (int n, // Numero de vertices.
 	    }
 	    
 	}else{
+	    cout<<"no colors sucker"<<endl;
 	    back = true;
 	}
+
+	cout<<"back: "<<back<<endl;
 	
 	if(back){
+
+	    cout << "labels" << endl;
+	    for(int i =0; i<dummy.order.size();i++)
+		cout<<dummy.order[i].first<<" c: "
+		    <<graph[dummy.order[i].first].label<<endl;
+	    
 
 	    set<int> colores;
 	    for(int i = 0; i < k; i++){
@@ -411,19 +438,13 @@ void brelaz (int n, // Numero de vertices.
 		    break;
 		}
 	    }
-	    cout<<"k: "<<dummy.order[k].first<<"\t Color: "<<graph[dummy.order[k].first].color;
-	    cout<<"\tlabel: "<<graph[dummy.order[k].first].label;
-	    cout<<"\t Sat: "<<graph[dummy.order[k].first].satDegree;
-	    cout<<"\t Edges:"<<graph[dummy.order[k].first].edge.size()<<" {";
-	    for(int j=0;j<graph[dummy.order[k].first].edge.size();j++)
-		cout<<graph[dummy.order[k].first].edge[j]<<" , ";
-	    cout<<"}"<<endl;
+	    cout<<"k: "<<dummy.order[k].first<<graph[dummy.order[k].first];
 	    
 	    if(k<=dummy.w){
 		cout <<"k: "<<k <<"<= " <<dummy.w<< endl;
 		break;
 	    }
-	    
+		
 	}
 
 	// for(int i = 0; i<graph.size(); i++){
@@ -511,8 +532,8 @@ int main( int argc, char *argv[] ){
 
     cout<<"w: "<<ans.w<<"\tq: "<<ans.q<<endl;
 
-    for(int i =0; i<ans.order.size();i++)
-    	cout<<ans.order[i].first<<" c: "<<ans.order[i].second<<endl;
+    // for(int i =0; i<ans.order.size();i++)
+    // 	cout<<ans.order[i].first<<" c: "<<ans.order[i].second<<endl;
 
     brelaz (graph.size(),ans,graph);
     
