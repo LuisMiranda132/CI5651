@@ -26,9 +26,11 @@ class Node
 {
 public:
     int color, satDegree, posColor;
-    vector<int> posibleColor, edge;
-    
-    Node(int c=0, int s=0):color(c),satDegree(s),posColor(INT_MAX){};
+    vector<int>  edge;
+    set<int> U; //posibleColor
+    bool label;
+        
+    Node(int c=0, int s=0):color(c),satDegree(s),posColor(INT_MAX),label(false){};
     ~Node(){};
     
 };
@@ -67,13 +69,29 @@ public:
 /*
     Heuritica de desaturacion
 */
-pair< int, vector< pair<int,int> > > desatur(vector<Node> graph, int n){
 
+struct answer
+{
+    int w;
+    int q;
+    vector <pair<int,int> > order;
+};
+
+    
+//pair< pair<int,int>,vector<pair<int,int> > >
+answer desatur(vector<Node> graph, int n){
+
+    answer ans;
+    ans.w = 0;
+    ans.q = 1;
+    
     vector< pair<int,Node*> > saturation;
-    int max_color = 1, top = 1;
+    int max_color = 1;
+    //int top = 1;
     bool cliq = true;
     set<int> usedColor;
-    vector< pair<int,int> > clique;
+    //int clique = 0;
+    //vector< pair<int,int> > order;
     
     // for(int i = 0; i<graph.size(); i++){
     // 	cout<<"i: "<<i<<"\t Color: "<<graph[i].color;
@@ -113,12 +131,12 @@ pair< int, vector< pair<int,int> > > desatur(vector<Node> graph, int n){
 	//     cout<<"}\t posColor:"<<graph[i].posColor<<endl;
 	// }	
 	saturation[0].second->color = saturation[0].second->posColor;
-	top = saturation[0].second->color > top ? saturation[0].second->color :
-	    top;
-	
+	ans.q = saturation[0].second->color > ans.q ? saturation[0].second->color :
+	    ans.q;
+	ans.order.push_back(make_pair(saturation[0].first,saturation[0].second->color));	
 	if(cliq){
 	    if(cliq = !usedColor.count(saturation[0].second->color)){
-		clique.push_back(make_pair(saturation[0].first,saturation[0].second->color));
+		ans.w++;
 		usedColor.insert(saturation[0].second->color);
 	    }else{
 		cliq=false;
@@ -183,7 +201,8 @@ pair< int, vector< pair<int,int> > > desatur(vector<Node> graph, int n){
     	cout<<"}\t posColor:"<<graph[i].posColor<<endl;
     }
     
-    return make_pair(top,clique);
+//    return make_pair(make_pair(clique,top),order);
+    return ans;
 }
 
 //==============================================================================
@@ -282,23 +301,153 @@ vector<Node> readGraph(char* fileName, int &sizeGraph){
 // }
 
 void brelaz (int n, // Numero de vertices.
-             int q, // Numero de colores de la heuristica. 
-             int w,  // Dimension inicial del Clique.
+//             int q, // Numero de colores de la heuristica. 
+//             int w,  // Dimension inicial del Clique.
+	     answer dummy, 
              vector<Node>& graph
              )
 {
-    vector<int> colorOrder;
     
-    // bool back = false;
-    // int k = w + 1;
+    bool back = false;
+    for(int i=0;i<dummy.w;i++)
+	graph[dummy.order[i].first].color = dummy.order[i].second;
+
+    int k = dummy.w,
+	uk = dummy.w,
+	s = dummy.w;
+
+    for(int i = 0; i<graph.size(); i++){
+    	cout<<"i: "<<i<<"\t Color: "<<graph[i].color;
+    	cout<<"\t Sat: "<<graph[i].satDegree;
+    	cout<<"\t Edges:"<<graph[i].edge.size()<<" {";
+    	for(int j=0;j<graph[i].edge.size();j++)
+    	    cout<<graph[i].edge[j]<<" , ";
+    	cout<<"}\t posColor:"<<graph[i].posColor<<endl;
+    }
+
+    cout << "welp" << endl;
+        
+    while (true){
+    int lenodo;
     
-    // while (true){
-    //     if (!back){
-    //         min(colorUsed + 1, q - 1);
-            
-    //     }
-    //     else {
-            
+        if (!back){
+	    lenodo = dummy.order[k].first;
+	    cout << k <<": " <<lenodo<< endl;
+
+	    for(int i=1; i <= min(uk + 1, dummy.q); i++)
+		    graph[lenodo].U.insert(i);
+		
+	    for(int i=0; i<graph[lenodo].edge.size();i++){
+		Node node = graph[graph[lenodo].edge[i]];
+		if(node.color!=0)
+		    graph[lenodo].U.erase(node.color);
+	    }
+	    for(int i : graph[lenodo].U)
+		cout << "\t" << i << endl;
+	    
+	}
+	else {
+	    graph[dummy.order[k].first].U.erase(
+	    	graph[dummy.order[k].first].color);
+	    graph[dummy.order[k].first].label = false;
+	}
+	
+	if(!graph[lenodo].U.empty()){
+	    int minColor = dummy.q;
+	    for(int i : graph[lenodo].U){
+		minColor = i < minColor ? i : minColor;
+	    }
+	    graph[lenodo].color = minColor;
+	    s = graph[lenodo].color > s ? s+1 : s;
+	    
+	    k++;
+	    cout<<"k: "<<k<<"> "<<n<<endl;
+	    if(k>=n){
+		dummy.q = s;
+		if(dummy.q == dummy.w)
+		    break;
+		int k = 0;
+		while(dummy.q != graph[dummy.order[k].first].color)
+		    k++;
+		
+		// for(int i = 0; i<dummy.order.size();i++){
+		//     if(dummy.q == dummy.order[dummy.order[i].first].color){
+		// 	k = dummy.order[i].first;
+		// 	break;
+		//     }
+		// }
+		
+		for(int i = k; i<dummy.order.size();i++)
+		    graph[dummy.order[i].first].label = false;
+		back = false;
+	    }
+	    
+	}else{
+	    back = true;
+	}
+	
+	if(back){
+
+	    set<int> colores;
+	    for(int i = 0; i < k; i++){
+	    	for(int j=0;j<graph[dummy.order[k].first].edge.size();j++){
+	    	    if(dummy.order[i].first==graph[dummy.order[k].first].edge[j])
+	    	    {
+	    		if(!colores.count(graph[dummy.order[i].first].color)){
+
+	    		    graph[dummy.order[i].first].label = true;
+	    		    colores.insert(graph[dummy.order[i].first].color);
+			    //pinto
+	    		}
+			
+	    		break;
+	    	    }
+	    	}
+	    }
+	    
+	    for(int i = dummy.order.size()-1;i>=0;i--){
+		if(graph[dummy.order[i].first].label){
+		    k = i;
+		    break;
+		}
+	    }
+	    cout<<"k: "<<dummy.order[k].first<<"\t Color: "<<graph[dummy.order[k].first].color;
+	    cout<<"\tlabel: "<<graph[dummy.order[k].first].label;
+	    cout<<"\t Sat: "<<graph[dummy.order[k].first].satDegree;
+	    cout<<"\t Edges:"<<graph[dummy.order[k].first].edge.size()<<" {";
+	    for(int j=0;j<graph[dummy.order[k].first].edge.size();j++)
+		cout<<graph[dummy.order[k].first].edge[j]<<" , ";
+	    cout<<"}"<<endl;
+	    
+	    if(k<=dummy.w){
+		cout <<"k: "<<k <<"<= " <<dummy.w<< endl;
+		break;
+	    }
+	    
+	}
+
+	// for(int i = 0; i<graph.size(); i++){
+	//     cout<<"i: "<<i<<"\t Color: "<<graph[i].color;
+	//     cout<<"\t Sat: "<<graph[i].satDegree;
+	//     cout<<"\t Edges:"<<graph[i].edge.size()<<" {";
+	//     for(int j=0;j<graph[i].edge.size();j++)
+	// 	cout<<graph[i].edge[j]<<" , ";
+	//     cout<<"}\t posColor:"<<graph[i].posColor<<endl;
+	// }
+    }
+
+    for(int i = 0; i<graph.size(); i++){
+	cout<<"i: "<<i<<"\t Color: "<<graph[i].color;
+	cout<<"\tlabel: "<<graph[i].label;
+	cout<<"\t Sat: "<<graph[i].satDegree;
+	cout<<"\t Edges:"<<graph[i].edge.size()<<" {";
+	for(int j=0;j<graph[i].edge.size();j++)
+	    cout<<graph[i].edge[j]<<" , ";
+	cout<<"}"<<endl;
+    }
+        
+    cout << "s: " << s << endl;
+    	    
     //     }
     //     if () {
     //         if (k > n) {
@@ -356,20 +505,25 @@ int main( int argc, char *argv[] ){
     // 	cout<<"}\t posColor:"<<graph[i].posColor<<endl;
     // }
 
-    pair< int, vector< pair<int,int> > > ans = desatur(graph,graph.size());
+//    pair< pair <int,int>,vector< pair<int,int> > >
+    answer
+	ans = desatur(graph,graph.size());
 
-    cout<<ans.first<<"\nclique"<<endl;
-    for(int i =0; i<ans.second.size();i++)
-	cout<<ans.second[i].first<<" c: "<<ans.second[i].second<<endl;
+    cout<<"w: "<<ans.w<<"\tq: "<<ans.q<<endl;
 
-    for(int i = 0; i<graph.size(); i++){
-    	cout<<"i: "<<i<<"\t Color: "<<graph[i].color;
-    	cout<<"\t Sat: "<<graph[i].satDegree;
-    	cout<<"\t Edges:"<<graph[i].edge.size()<<" {";
-    	for(int j=0;j<graph[i].edge.size();j++)
-    	    cout<<graph[i].edge[j]<<" , ";
-    	cout<<"}\t posColor:"<<graph[i].posColor<<endl;
-    }
+    for(int i =0; i<ans.order.size();i++)
+    	cout<<ans.order[i].first<<" c: "<<ans.order[i].second<<endl;
+
+    brelaz (graph.size(),ans,graph);
+    
+    // for(int i = 0; i<graph.size(); i++){
+    // 	cout<<"i: "<<i<<"\t Color: "<<graph[i].color;
+    // 	cout<<"\t Sat: "<<graph[i].satDegree;
+    // 	cout<<"\t Edges:"<<graph[i].edge.size()<<" {";
+    // 	for(int j=0;j<graph[i].edge.size();j++)
+    // 	    cout<<graph[i].edge[j]<<" , ";
+    // 	cout<<"}\t posColor:"<<graph[i].posColor<<endl;
+    // }
 
 
     //=======
