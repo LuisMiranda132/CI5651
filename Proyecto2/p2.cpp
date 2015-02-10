@@ -114,14 +114,31 @@ answer desatur(vector<Node> graph, int n){
     // 	    cout<<graph[i].edge[j]<<" , ";
     // 	cout<<"}\t posColor:"<<graph[i].posColor<<endl;
     // }
+
     
     for(int i = 0; i<n; i++){
 	
 	saturation.push_back(make_pair(i,&(graph[i])));
     }
 
+    // cout << "sat" << endl;
+    
+    // for(int i = 0; i<n; i++){
+    // 	cout<<"i: "<<i<<"\t Color: "<<saturation[i].second->color<<"\t Sat: "<<saturation[i].second->satDegree<<"\t Edges: "<<saturation[i].second->edge.size()<<" {";
+    // 	for(int j=0;j<saturation[i].second->edge.size();j++)
+    // 	    cout<<saturation[i].second->edge[j]<<" , ";
+    // 	cout<<"}\t posColor:"<<saturation[i].second->posColor<<endl;
+    // }
+
+
     sort(saturation.begin(),saturation.end(),
 	 [](pair<int,Node*> left, pair<int,Node*> right){
+	     // cout<<"<><><><><><>><><><><><>"<<endl;
+	     // cout<<right.first<<": ";
+	     // cout<<(*right.second)<<endl;
+	     // cout<<left.first<<": "<<endl;
+	     // cout<<(*left.second)<<endl;
+	     cout<<endl;
 	     if(left.second->color == right.second->color)		 
 		 if(left.second->satDegree == right.second->satDegree){
 //	out<<left.second->satDegree<<"\t"<<right.second->satDegree<<endl;
@@ -144,7 +161,8 @@ answer desatur(vector<Node> graph, int n){
 	//     cout<<"}\t posColor:"<<graph[i].posColor<<endl;
 	// }	
 	saturation[0].second->color = saturation[0].second->posColor;
-	ans.q = saturation[0].second->color > ans.q ? saturation[0].second->color :
+	ans.q = saturation[0].second->color > ans.q ?
+	    saturation[0].second->color :
 	    ans.q;
 	ans.order.push_back(make_pair(saturation[0].first,saturation[0].second->color));	
 	if(cliq){
@@ -327,7 +345,7 @@ void brelaz (int n, // Numero de vertices.
 	graph[dummy.order[i].first].label = true;
     }
     
-    dummy.w = dummy.w -1;
+    dummy.w = dummy.w-1;
         
     int k = dummy.w+1,
 	uk = dummy.w+1,
@@ -351,17 +369,26 @@ void brelaz (int n, // Numero de vertices.
 	    lenodo = dummy.order[k].first;
 	    cout << "k= "<<k <<": " <<lenodo<< endl;
 	    cout << graph[lenodo] << endl;
+	    cout << "uk " << uk << " <> dummy.q " << dummy.q << endl;
 	    
 	    for(int i=1; i <= min(uk + 1, dummy.q); i++)
-		    graph[lenodo].U.insert(i);
+		graph[lenodo].U.insert(i);
+
+	    cout << "inb4" << endl;
+	    if(!graph[lenodo].U.empty())
+		for(int i : graph[lenodo].U)
+		    cout << "\t" << i << endl;
+
 		
 	    for(int i=0; i<graph[lenodo].edge.size();i++){
 		Node node = graph[graph[lenodo].edge[i]];
 		if(node.color!=0)
 		    graph[lenodo].U.erase(node.color);
 	    }
-	    for(int i : graph[lenodo].U)
-		cout << "\t" << i << endl;
+	    cout<< "g8b8m8" << endl;
+	    if(!graph[lenodo].U.empty())
+		for(int i : graph[lenodo].U)
+		    cout << "\t" << i << endl;
 	    
 	}
 	else {
@@ -373,21 +400,33 @@ void brelaz (int n, // Numero de vertices.
 	if(!graph[lenodo].U.empty()){
 	    int minColor = dummy.q;
 	    for(int i : graph[lenodo].U){
+		cout<<"colorsito: "<<i<<endl;
 		minColor = i < minColor ? i : minColor;
 	    }
+	    cout<<"coloreo con "<<minColor<<endl;
 	    graph[lenodo].color = minColor;
-	    s = graph[lenodo].color > s ? s+1 : s;
+	    if(graph[lenodo].color > s){
+		cout<<"new color"<<endl;
+		s = s+1;
+		uk++;
+	    }
 	    
 	    k++;
-	    cout<<"k: "<<k<<"> "<<n<<endl;
+	    cout<<"k: "<<k<<">= "<<n<<endl;
 	    if(k>=n){
+		cout << "entre lol\n s = "<<s << endl;
+
+		for(int i = 0; i<graph.size(); i++){
+		    cout<<"i: "<<i<<graph[i]<<endl;
+		}
+		
 		dummy.q = s;
 		if(dummy.q == dummy.w)
 		    break;
 		int k = 0;
 		while(dummy.q != graph[dummy.order[k].first].color)
 		    k++;
-		
+		cout <<"\t k = " <<k <<endl;
 		// for(int i = 0; i<dummy.order.size();i++){
 		//     if(dummy.q == dummy.order[dummy.order[i].first].color){
 		// 	k = dummy.order[i].first;
@@ -397,7 +436,7 @@ void brelaz (int n, // Numero de vertices.
 		
 		for(int i = k; i<dummy.order.size();i++)
 		    graph[dummy.order[i].first].label = false;
-		back = false;
+		back = true;
 	    }
 	    
 	}else{
@@ -409,36 +448,52 @@ void brelaz (int n, // Numero de vertices.
 	
 	if(back){
 
-	    cout << "labels" << endl;
-	    for(int i =0; i<dummy.order.size();i++)
-		cout<<dummy.order[i].first<<" c: "
-		    <<graph[dummy.order[i].first].label<<endl;
-	    
-
 	    set<int> colores;
-	    for(int i = 0; i < k; i++){
-	    	for(int j=0;j<graph[dummy.order[k].first].edge.size();j++){
-	    	    if(dummy.order[i].first==graph[dummy.order[k].first].edge[j])
-	    	    {
-	    		if(!colores.count(graph[dummy.order[i].first].color)){
+	    // for(int i = 0; i < k; i++){
+	    // 	for(int j=0;j<graph[dummy.order[k].first].edge.size();j++){
+	    // 	    if(dummy.order[i].first==graph[dummy.order[k].first].edge[j])
+	    // 	    {
+	    // 		if(!colores.count(graph[dummy.order[i].first].color)){
 
-	    		    graph[dummy.order[i].first].label = true;
-	    		    colores.insert(graph[dummy.order[i].first].color);
-			    //pinto
-	    		}
+	    // 		    graph[dummy.order[i].first].label = true;
+	    // 		    colores.insert(graph[dummy.order[i].first].color);
+	    // 		    //pinto
+	    // 		}
 			
-	    		break;
-	    	    }
-	    	}
-	    }
-	    
-	    for(int i = dummy.order.size()-1;i>=0;i--){
-		if(graph[dummy.order[i].first].label){
-		    k = i;
-		    break;
+	    // 		break;
+	    // 	    }
+	    // 	}
+	    // }
+
+	    for(int j=0;j<graph[dummy.order[k].first].edge.size();j++){
+		if(j<k)
+//dummy.order[i].first==graph[dummy.order[k].first].edge[j])
+		{
+		    if(!colores.count(graph[dummy.order[j].first].color)){
+			
+	    		    graph[dummy.order[j].first].label = true;
+	    		    colores.insert(graph[dummy.order[j].first].color);
+			    cout << "<><><><><><><>"<<endl;
+			    cout << graph[dummy.order[j].first] <<endl;
+			    
+			    //pinto
+		    }
+		    
 		}
 	    }
-	    cout<<"k: "<<dummy.order[k].first<<graph[dummy.order[k].first];
+
+	    cout<<"k: "<<dummy.order[k].first<<graph[dummy.order[k].first]<<endl;
+	    cout << "labels" << endl;
+	    for(int i =0; i<dummy.order.size();i++)
+	    	cout<<dummy.order[i].first<<" c: "
+	    	    <<graph[dummy.order[i].first].label<<endl;
+	    
+	    for(int i = dummy.order.size()-1;i>=0;i--){
+	    	if(graph[dummy.order[i].first].label){
+	    	    k = i;
+	    	    break;
+	    	}
+	    }
 	    
 	    if(k<=dummy.w){
 		cout <<"k: "<<k <<"<= " <<dummy.w<< endl;
@@ -447,6 +502,8 @@ void brelaz (int n, // Numero de vertices.
 		
 	}
 
+	cout << "<^><^><^><^><^^><^><^><^>^<^><^><^>^<>^<^><^>^<>^<>^<^" <<endl;
+	
 	// for(int i = 0; i<graph.size(); i++){
 	//     cout<<"i: "<<i<<"\t Color: "<<graph[i].color;
 	//     cout<<"\t Sat: "<<graph[i].satDegree;
@@ -535,6 +592,10 @@ int main( int argc, char *argv[] ){
     // for(int i =0; i<ans.order.size();i++)
     // 	cout<<ans.order[i].first<<" c: "<<ans.order[i].second<<endl;
 
+    
+    // for(int i =0; i<ans.order.size();i++)
+    // 	cout<<ans.order[i].first<<" c: "<<ans.order[i].second<<endl;
+    
     brelaz (graph.size(),ans,graph);
     
     // for(int i = 0; i<graph.size(); i++){
