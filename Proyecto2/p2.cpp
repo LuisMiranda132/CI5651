@@ -90,8 +90,16 @@ struct answer
     vector <pair<int,int> > order;
 };
 
+int lambda(pair<int,Node*> left, pair<int,Node*> right){
+    if(left.second->color == right.second->color)		 
+	if(left.second->satDegree == right.second->satDegree){
+	    return left.second->edge.size() >= right.second->edge.size();
+	}else
+	    return left.second->satDegree >= right.second->satDegree;
+    else
+	return left.second->color < right.second->color;
+}
     
-//pair< pair<int,int>,vector<pair<int,int> > >
 answer desatur(vector<Node> graph, int n){
 
     answer ans;
@@ -106,60 +114,14 @@ answer desatur(vector<Node> graph, int n){
     //int clique = 0;
     //vector< pair<int,int> > order;
     
-    // for(int i = 0; i<graph.size(); i++){
-    // 	cout<<"i: "<<i<<"\t Color: "<<graph[i].color;
-    // 	cout<<"\t Sat: "<<graph[i].satDegree;
-    // 	cout<<"\t Edges:"<<graph[i].edge.size()<<" {";
-    // 	for(int j=0;j<graph[i].edge.size();j++)
-    // 	    cout<<graph[i].edge[j]<<" , ";
-    // 	cout<<"}\t posColor:"<<graph[i].posColor<<endl;
-    // }
-
-    
     for(int i = 0; i<n; i++){
 	
 	saturation.push_back(make_pair(i,&(graph[i])));
     }
 
-    // cout << "sat" << endl;
-    
-    // for(int i = 0; i<n; i++){
-    // 	cout<<"i: "<<i<<"\t Color: "<<saturation[i].second->color<<"\t Sat: "<<saturation[i].second->satDegree<<"\t Edges: "<<saturation[i].second->edge.size()<<" {";
-    // 	for(int j=0;j<saturation[i].second->edge.size();j++)
-    // 	    cout<<saturation[i].second->edge[j]<<" , ";
-    // 	cout<<"}\t posColor:"<<saturation[i].second->posColor<<endl;
-    // }
-
-
-    sort(saturation.begin(),saturation.end(),
-	 [](pair<int,Node*> left, pair<int,Node*> right){
-	     // cout<<"<><><><><><>><><><><><>"<<endl;
-	     // cout<<right.first<<": ";
-	     // cout<<(*right.second)<<endl;
-	     // cout<<left.first<<": "<<endl;
-	     // cout<<(*left.second)<<endl;
-	     cout<<endl;
-	     if(left.second->color == right.second->color)		 
-		 if(left.second->satDegree == right.second->satDegree){
-//	out<<left.second->satDegree<<"\t"<<right.second->satDegree<<endl;
-		     return left.second->edge.size() >= right.second->edge.size();
-		 }else
-		     return left.second->satDegree >= right.second->satDegree;
-	     else
-		 return left.second->color < right.second->color;
-	 }
-	);
+    sort(saturation.begin(),saturation.end(),lambda);
     saturation[0].second->posColor = 1;
     while(!saturation[0].second->color){
-	// cout << "while"<< endl;
-	// for(int i = 0; i<graph.size(); i++){
-	//     cout<<"i: "<<i<<"\t Color: "<<graph[i].color;
-	//     cout<<"\t Sat: "<<graph[i].satDegree;
-	//     cout<<"\t Edges:"<<graph[i].edge.size()<<" {";
-	//     for(int j=0;j<graph[i].edge.size();j++)
-	// 	cout<<graph[i].edge[j]<<" , ";
-	//     cout<<"}\t posColor:"<<graph[i].posColor<<endl;
-	// }	
 	saturation[0].second->color = saturation[0].second->posColor;
 	ans.q = saturation[0].second->color > ans.q ?
 	    saturation[0].second->color :
@@ -200,39 +162,9 @@ answer desatur(vector<Node> graph, int n){
 	    }
 	    
 	}
-	sort(saturation.begin(),saturation.end(),
-	     [](pair<int,Node*> left, pair<int,Node*> right){
-		 if(left.second->color == right.second->color)		 
-		     if(left.second->satDegree == right.second->satDegree){
-//	      cout<<left.second->satDegree<<"\t"<<right.second->satDegree<<endl;
-			 return left.second->edge.size() >= right.second->edge.size();
-		     }else
-			 return left.second->satDegree >= right.second->satDegree;
-		 else
-		     return left.second->color < right.second->color;
-	     }
-	    );
-	// cout<<"sat"<<endl;
-	// for(int i = 0; i<n; i++){
-	//     cout<<"i: "<<i<<"\t Color: "<<saturation[i].second->color<<"\t Sat: "<<saturation[i].second->satDegree<<"\t Edges: "<<saturation[i].second->edge.size()<<" {";
-	//     for(int j=0;j<saturation[i].second->edge.size();j++)
-	// 	cout<<saturation[i].second->edge[j]<<" , ";
-	//     cout<<"}\t posColor:"<<saturation[i].second->posColor<<endl;
-	// }
-
+	sort(saturation.begin(),saturation.end(),lambda);
     }
     
-    // cout << "end"<<endl;
-    // for(int i = 0; i<graph.size(); i++){
-    // 	cout<<"i: "<<i<<"\t Color: "<<graph[i].color;
-    // 	cout<<"\t Sat: "<<graph[i].satDegree;
-    // 	cout<<"\t Edges:"<<graph[i].edge.size()<<" {";
-    // 	for(int j=0;j<graph[i].edge.size();j++)
-    // 	    cout<<graph[i].edge[j]<<" , ";
-    // 	cout<<"}\t posColor:"<<graph[i].posColor<<endl;
-    // }
-    
-//    return make_pair(make_pair(clique,top),order);
     return ans;
 }
 
@@ -332,8 +264,6 @@ vector<Node> readGraph(char* fileName, int &sizeGraph){
 // }
 
 void brelaz (int n, // Numero de vertices.
-//             int q, // Numero de colores de la heuristica. 
-//             int w,  // Dimension inicial del Clique.
 	     answer dummy, 
              vector<Node>& graph
              )
@@ -350,45 +280,21 @@ void brelaz (int n, // Numero de vertices.
     int k = dummy.w+1,
 	uk = dummy.w+1,
 	s = dummy.w+1;
-
-/*    for(int i = 0; i<graph.size(); i++){
-    	cout<<"i: "<<i<<"\t Color: "<<graph[i].color;
-    	cout<<"\t Sat: "<<graph[i].satDegree;
-    	cout<<"\t Edges:"<<graph[i].edge.size()<<" {";
-    	for(int j=0;j<graph[i].edge.size();j++)
-    	    cout<<graph[i].edge[j]<<" , ";
-    	cout<<"}\t posColor:"<<graph[i].posColor<<endl;
-    }
-*/
-    cout << "welp" << endl;
         
     while (true){
     int lenodo;
     
         if (!back){
 	    lenodo = dummy.order[k].first;
-	    cout << "k= "<<k <<": " <<lenodo<< endl;
-	    cout << graph[lenodo] << endl;
-	    cout << "uk " << uk << " <> dummy.q " << dummy.q << endl;
 	    
 	    for(int i=1; i <= min(uk + 1, dummy.q); i++)
 		graph[lenodo].U.insert(i);
-
-	    cout << "inb4" << endl;
-	    if(!graph[lenodo].U.empty())
-		for(int i : graph[lenodo].U)
-		    cout << "\t" << i << endl;
-
 		
 	    for(int i=0; i<graph[lenodo].edge.size();i++){
 		Node node = graph[graph[lenodo].edge[i]];
 		if(node.color!=0)
 		    graph[lenodo].U.erase(node.color);
 	    }
-	    cout<< "g8b8m8" << endl;
-	    if(!graph[lenodo].U.empty())
-		for(int i : graph[lenodo].U)
-		    cout << "\t" << i << endl;
 	    
 	}
 	else {
@@ -400,25 +306,16 @@ void brelaz (int n, // Numero de vertices.
 	if(!graph[lenodo].U.empty()){
 	    int minColor = dummy.q;
 	    for(int i : graph[lenodo].U){
-		cout<<"colorsito: "<<i<<endl;
 		minColor = i < minColor ? i : minColor;
 	    }
-	    cout<<"coloreo con "<<minColor<<endl;
 	    graph[lenodo].color = minColor;
 	    if(graph[lenodo].color > s){
-		cout<<"new color"<<endl;
 		s = s+1;
 		uk++;
 	    }
 	    
 	    k++;
-	    cout<<"k: "<<k<<">= "<<n<<endl;
 	    if(k>=n){
-		cout << "entre lol\n s = "<<s << endl;
-
-		for(int i = 0; i<graph.size(); i++){
-		    cout<<"i: "<<i<<graph[i]<<endl;
-		}
 		
 		dummy.q = s;
 		if(dummy.q == dummy.w)
@@ -426,13 +323,6 @@ void brelaz (int n, // Numero de vertices.
 		int k = 0;
 		while(dummy.q != graph[dummy.order[k].first].color)
 		    k++;
-		cout <<"\t k = " <<k <<endl;
-		// for(int i = 0; i<dummy.order.size();i++){
-		//     if(dummy.q == dummy.order[dummy.order[i].first].color){
-		// 	k = dummy.order[i].first;
-		// 	break;
-		//     }
-		// }
 		
 		for(int i = k; i<dummy.order.size();i++)
 		    graph[dummy.order[i].first].label = false;
@@ -440,53 +330,25 @@ void brelaz (int n, // Numero de vertices.
 	    }
 	    
 	}else{
-	    cout<<"no colors sucker"<<endl;
 	    back = true;
 	}
-
-	cout<<"back: "<<back<<endl;
 	
 	if(back){
 
 	    set<int> colores;
-	    // for(int i = 0; i < k; i++){
-	    // 	for(int j=0;j<graph[dummy.order[k].first].edge.size();j++){
-	    // 	    if(dummy.order[i].first==graph[dummy.order[k].first].edge[j])
-	    // 	    {
-	    // 		if(!colores.count(graph[dummy.order[i].first].color)){
-
-	    // 		    graph[dummy.order[i].first].label = true;
-	    // 		    colores.insert(graph[dummy.order[i].first].color);
-	    // 		    //pinto
-	    // 		}
-			
-	    // 		break;
-	    // 	    }
-	    // 	}
-	    // }
 
 	    for(int j=0;j<graph[dummy.order[k].first].edge.size();j++){
 		if(j<k)
-//dummy.order[i].first==graph[dummy.order[k].first].edge[j])
 		{
 		    if(!colores.count(graph[dummy.order[j].first].color)){
 			
 	    		    graph[dummy.order[j].first].label = true;
 	    		    colores.insert(graph[dummy.order[j].first].color);
-			    cout << "<><><><><><><>"<<endl;
-			    cout << graph[dummy.order[j].first] <<endl;
-			    
 			    //pinto
 		    }
 		    
 		}
 	    }
-
-	    cout<<"k: "<<dummy.order[k].first<<graph[dummy.order[k].first]<<endl;
-	    cout << "labels" << endl;
-	    for(int i =0; i<dummy.order.size();i++)
-	    	cout<<dummy.order[i].first<<" c: "
-	    	    <<graph[dummy.order[i].first].label<<endl;
 	    
 	    for(int i = dummy.order.size()-1;i>=0;i--){
 	    	if(graph[dummy.order[i].first].label){
@@ -496,61 +358,13 @@ void brelaz (int n, // Numero de vertices.
 	    }
 	    
 	    if(k<=dummy.w){
-		cout <<"k: "<<k <<"<= " <<dummy.w<< endl;
 		break;
-	    }
-		
+	    }	
 	}
-
-	cout << "<^><^><^><^><^^><^><^><^>^<^><^><^>^<>^<^><^>^<>^<>^<^" <<endl;
-	
-	// for(int i = 0; i<graph.size(); i++){
-	//     cout<<"i: "<<i<<"\t Color: "<<graph[i].color;
-	//     cout<<"\t Sat: "<<graph[i].satDegree;
-	//     cout<<"\t Edges:"<<graph[i].edge.size()<<" {";
-	//     for(int j=0;j<graph[i].edge.size();j++)
-	// 	cout<<graph[i].edge[j]<<" , ";
-	//     cout<<"}\t posColor:"<<graph[i].posColor<<endl;
-	// }
-    }
-
-    for(int i = 0; i<graph.size(); i++){
-	cout<<"i: "<<i<<"\t Color: "<<graph[i].color;
-	cout<<"\tlabel: "<<graph[i].label;
-	cout<<"\t Sat: "<<graph[i].satDegree;
-	cout<<"\t Edges:"<<graph[i].edge.size()<<" {";
-	for(int j=0;j<graph[i].edge.size();j++)
-	    cout<<graph[i].edge[j]<<" , ";
-	cout<<"}"<<endl;
     }
         
-    cout << "s: " << s << endl;
-    	    
-    //     }
-    //     if () {
-    //         if (k > n) {
-    //             // EXIT IF
-    //             if (q == w){
-    //                 break;
-    //             }
-    //         }
-    //         else{
-    //             back = false;
-    //         }
-    //     }
-    //     else {
-    //         back = true;
-    //     }
-    //     if (back) {
-            
-    //         // EXIT IF
-    //         if (k<w+1){
-    //             break;
-    //         }
-    //     }
-    // }
-    // // STOP ??
-    
+    cout << s << endl;
+    	        
 }
 
 //==============================================================================
@@ -574,42 +388,12 @@ int main( int argc, char *argv[] ){
     }
     graph = readGraph(fileName, nodeNum);
         
-    // for(int i = 0; i<graph.size(); i++){
-    // 	cout<<"i: "<<i<<"\t Color: "<<graph[i].color;
-    // 	cout<<"\t Sat: "<<graph[i].satDegree;
-    // 	cout<<"\t Edges:"<<graph[i].edge.size()<<" {";
-    // 	for(int j=0;j<graph[i].edge.size();j++)
-    // 	    cout<<graph[i].edge[j]<<" , ";
-    // 	cout<<"}\t posColor:"<<graph[i].posColor<<endl;
-    // }
+    answer ans = desatur(graph,graph.size());
 
-//    pair< pair <int,int>,vector< pair<int,int> > >
-    answer
-	ans = desatur(graph,graph.size());
-
-    cout<<"w: "<<ans.w<<"\tq: "<<ans.q<<endl;
-
-    // for(int i =0; i<ans.order.size();i++)
-    // 	cout<<ans.order[i].first<<" c: "<<ans.order[i].second<<endl;
-
-    
-    // for(int i =0; i<ans.order.size();i++)
-    // 	cout<<ans.order[i].first<<" c: "<<ans.order[i].second<<endl;
+    cout<<ans.q <<" ";
     
     brelaz (graph.size(),ans,graph);
     
-    // for(int i = 0; i<graph.size(); i++){
-    // 	cout<<"i: "<<i<<"\t Color: "<<graph[i].color;
-    // 	cout<<"\t Sat: "<<graph[i].satDegree;
-    // 	cout<<"\t Edges:"<<graph[i].edge.size()<<" {";
-    // 	for(int j=0;j<graph[i].edge.size();j++)
-    // 	    cout<<graph[i].edge[j]<<" , ";
-    // 	cout<<"}\t posColor:"<<graph[i].posColor<<endl;
-    // }
-
-
-    //=======
-
 }
 
 
