@@ -44,7 +44,7 @@ determinada.
 class ACMCase{
 public:
 	int numCases, numRestrictedWords;
-	vector<vector<string>> words;		// Vector con los las oraciones a evaluar(vectores de string).
+	vector< vector<string> > words;		// Vector con los las oraciones a evaluar(vectores de string).
 	vector<string> restrictedWords;		// Vector con las palbras a ignorar
 	ACMCase(){
 		this->numCases = 0;
@@ -55,7 +55,7 @@ public:
 	void solveWord(vector<string> statement){
 		
 		pair<int, int> sp;					// Par <numero de letras confirmadas de la abreviacion, numero de ultima palbra usada para completar abreviacion>
-		vector<pair<int, int>> solutions;	// Vector con las posibles abreviaciones
+		vector<pair<int, int> > solutions;	// Vector con las posibles abreviaciones
 		int numSolution = 0;				// Numero de abreviaciones confirmadas
 		int as = statement[0].size();
 		int checkSolUntil;
@@ -134,7 +134,7 @@ Procedimiento que dado el nombre de un archivo, lo lee y devuelve un vector
 con los casosa evaluar.
 */
 
-vector<ACMCase> readFile(char *fileName){
+vector<ACMCase> readFile(const char *fileName){
 
 	ifstream fileStream(fileName);			// stream del archivo
 	string currentLine;						// ultima linea leida
@@ -230,7 +230,7 @@ vector<ACMCase> readFile(char *fileName){
 
 int main(int argc, char *argv[]){
 
-	char *fileName;
+	const char *fileName;
 	int nodeNum = 0;
 	vector<ACMCase> cases;
 
