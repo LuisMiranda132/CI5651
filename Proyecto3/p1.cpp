@@ -1,101 +1,144 @@
-#include <algorithm>
-#include <cctype>
-#include <climits>
-#include <cmath>
-#include <cstdio>
-#include <cstdlib>
-#include <cstring>
+#include <fstream>
 #include <iostream>
-#include <list>
-#include <map>
-#include <queue>
-#include <set>
-#include <sstream>
-#include <stack>
+#include <stdio.h>
+#include <stdlib.h>
 #include <string>
-#include <vector>
-
-#define inf 1000000000
-#define MAXN 151
+#include <string.h>
+#include <algorithm>
 
 using namespace std;
-
-int dp[MAXN][MAXN][2];
-string abbr, abbreviation;
-int abbr_len;
+int s = 0, e = 0;
+int solutions[100][100][2];
 string phrase;
-int phrase_len;
+int sizeAcm, numWord, wordSize, phraseSize;
+string acmU;
 
-int rek(int pos = 0, int abbr_pos = 0, bool took_a_char = false) {
-    if (pos == phrase_len) return abbr_pos == abbr_len && took_a_char;
-    if (dp[pos][abbr_pos][took_a_char] != -1) return dp[pos][abbr_pos][took_a_char];
-    if (phrase[pos] == ' ') {
-        if (!took_a_char) return 0;
-        else return dp[pos][abbr_pos][took_a_char] = rek(pos+1, abbr_pos, false);
-    }
-    if (abbr_pos == abbr_len) return dp[pos][abbr_pos][took_a_char] = rek(pos+1, abbr_pos, took_a_char);
+int solve(int pos , int posAcm , bool lastWordTaked ) {
 
-    dp[pos][abbr_pos][took_a_char] = rek(pos+1, abbr_pos, took_a_char);
-    if (phrase[pos] == abbr[abbr_pos]) {
-        dp[pos][abbr_pos][took_a_char] += rek(pos+1, abbr_pos+1, true);
-    }
+	
+	if (solutions[pos][posAcm][lastWordTaked] != -1){
+		return solutions[pos][posAcm][lastWordTaked];
+	}
 
-    return dp[pos][abbr_pos][took_a_char];
+	if (pos == phraseSize){
+		return posAcm == sizeAcm && lastWordTaked;
+	}
+
+	if (phrase[pos]== ' ') {
+		if (!lastWordTaked) {
+			return 0;
+		}
+		else
+		{
+			return solutions[pos][posAcm][lastWordTaked] = solve(pos + 1, posAcm, false);
+		}
+	}
+
+	if (posAcm == sizeAcm){
+		return solutions[pos][posAcm][lastWordTaked] = solve(pos + 1, posAcm, lastWordTaked);
+	}
+
+	solutions[pos][posAcm][lastWordTaked] = solve(pos + 1, posAcm, lastWordTaked);
+	
+	if (phrase[pos] == acmU[posAcm]) {
+		solutions[pos][posAcm][lastWordTaked] += solve(pos + 1, posAcm + 1, true);
+	}
+
+	return solutions[pos][posAcm][lastWordTaked];
 }
 
-int main() {
-    while (true) {
-        int t;
-        cin >> t;
-        if (!t) return 0;
+int main(int argc, char *argv[]){
 
-        set<string> insignificant_words;
-        
-        string insignificant_word;
-        for (int qwertz = 0; qwertz < t; ++qwertz) {
-            cin >> insignificant_word;
-            insignificant_words.insert(insignificant_word);
-        }
-        
-        string line;
-        // read all the words
-        getline(cin, line); // read \n
+	int nRestrictedWords;
+	string acm, word;
+	char str[151];
+	string restrictedWords[100];
+	bool valid;
 
-        while (true) {
-            getline(cin, line);
+	// Lectura y preprocesamiento de cada grupo de casos
+	while (1){
+		scanf("%d", &nRestrictedWords);
 
-            istringstream iss(line);
+		if (nRestrictedWords == 0){
+			break;
+		}
 
-            getline(iss, abbreviation, ' ');
-            abbr = abbreviation;
-            transform(abbreviation.begin(), abbreviation.end(), abbr.begin(), ::tolower);
-            abbr_len = abbr.size();
+		for (int i = 0; i < nRestrictedWords; i++){
 
-            vector<string> words;
-            string word;
-            getline(iss, word, ' ');
-            
-            if (abbreviation == "LAST" && word == "CASE") break;
+			scanf("%150s", &str);
+			restrictedWords[i] = str;
 
-            do {
-                if (!word.empty() && insignificant_words.find(word) == insignificant_words.end()) {
-                    words.push_back(word);
-                }
-            } while (getline(iss, word, ' '));
+		}
 
-            phrase = "";
-            for (vector<string>::iterator it = words.begin(); it != words.end(); ++it) {
-                phrase += ' ' + *it;
-            }
-            phrase_len = phrase.size();
+		scanf("%150s", &str);
+		acm = str;
+		acmU = acm;
 
-            memset(dp, -1, sizeof dp);
-            int sol = rek(1);
-            
-            if (sol) cout << abbreviation << " can be formed in " << sol << " ways" << endl;
-            else cout << abbreviation << " is not a valid abbreviation" << endl;
-        }
-    }
+		scanf("%150s", &str);
+		word = str;
+		wordSize = word.size();
 
-    return 0;
+		sizeAcm = acm.size();
+		numWord = 0;
+
+		phrase = "";
+
+		transform(acm.begin(), acm.end(), acmU.begin(), ::tolower);
+
+		//memset(solutions, 0, sizeof(int) * 150);
+
+		// Lectura y pre procesamiento de cada caso
+		while (islower(word[0])){
+			int init = 1;
+			valid = true;
+
+			for (int i = 0; i < nRestrictedWords; i++){
+				if (restrictedWords[i] == word){
+					valid = false;
+					break;
+				}
+			}
+
+			if (valid){ phrase += " " + word; }
+
+			scanf("%150s", &str);
+			word = str;
+
+			if (isupper(word[0])){
+
+				memset(solutions, -1, sizeof solutions);
+				phraseSize = phrase.size();
+
+				int Pos = solve(1,0,false);
+				
+				if (Pos == 0){
+					printf("%s is not a valid abbreviation\n", acm.c_str());
+				}
+				else {
+					printf("%s can be formed in %i ways\n", acm.c_str(), Pos);
+				}
+
+				acm = word;
+				acmU = acm;
+
+				numWord = 0;
+				
+				sizeAcm = acm.size();
+				transform(acm.begin(), acm.end(), acmU.begin(), ::tolower);
+				scanf("%150s", &str);
+				word = str;
+				phrase = "";
+				valid = false;
+			}
+
+			if (valid){
+				++numWord;
+			}
+
+		}
+
+	}
+	//while (1){
+
+	//};
 }
